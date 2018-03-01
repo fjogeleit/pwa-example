@@ -1,0 +1,19 @@
+{
+  "name": "DresdenJS - Progressive Web App",
+  "short_name": "DresdenJS",
+  "icons": [
+    {
+      "src": "/assets/icons/icon144x144.png",
+      "type": "image/png",
+      "sizes": "144x144"
+    }
+  ],
+  "start_url": "/index.html",
+  "scope": ".",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#EED71D",
+  "theme_color": "#000000",
+  "description": "A Progressive Web App Example in plain JavaScript",
+  "lang": "de-DE"
+}

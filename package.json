@@ -1,0 +1,22 @@
+{
+  "name": "pwa-example",
+  "version": "1.0.0",
+  "description": "Progressive Web App by Example",
+  "main": "app.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fjogeleit/pwa-example.git"
+  },
+  "scripts": {
+    "start": "http-server -c-1"
+  },
+  "author": "Frank Jogeleit",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/fjogeleit/pwa-example/issues"
+  },
+  "homepage": "https://github.com/fjogeleit/pwa-example#readme",
+  "devDependencies": {
+    "http-server": "^0.11.1"
+  }
+}
