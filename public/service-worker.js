@@ -15,20 +15,18 @@ self.addEventListener('install', event => {
 
     return cache.addAll(STATIC_FILES)
   })())
-});
+})
 
 self.addEventListener('fetch', (event) => {
   // return static files from the cache
   if (arrayIncludes(event.request.url, STATIC_FILES) === true) {
-    event.respondWith(
-      caches.match(event.request)
-    );
+    event.respondWith(caches.match(event.request))
 
-    return;
+    return
   }
 
+  // try to return new data, cache as fallback
   if (event.request.headers.get('accept').includes('application/json')) {
-    // try to return new data, cache as fallback
     event.respondWith((async () => {
       try {
         const response = await fetch(event.request)
@@ -51,25 +49,28 @@ self.addEventListener('fetch', (event) => {
       }
     })())
 
-    return;
+    return
   }
 
   // fetch dynamic files the first time and return the second time from the cache
-  event.respondWith(
-    caches.match(event.request).then(response => {
-      if (response) return response;
+  event.respondWith((async () => {
+    const response = await caches.match(event.request)
 
-      console.log('Dynamic Caching: %s', event.request.url)
-      return fetch(event.request).then(result => caches
-        .open('dynamic_files')
-        .then(cache => {
-          cache.put(event.request.url, result.clone());
-          return result;
-        })
-      )
-    })
-  )
-});
+    if (response) return response;
+
+    console.log('Dynamic Caching: %s', event.request.url)
+    const result = await fetch(event.request)
+    const cache = await caches.open('dynamic_files')
+
+    cache.put(event.request.url, result.clone())
+
+    return result
+  })())
+})
+
+self.addEventListener('sync', event => {
+  console.log(event)
+})
 
 const arrayIncludes = (string, array) => {
   if (string.indexOf(self.origin) === -1) {
