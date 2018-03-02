@@ -52,24 +52,50 @@ self.addEventListener('fetch', (event) => {
     return
   }
 
-  // fetch dynamic files the first time and return the second time from the cache
-  event.respondWith((async () => {
-    const response = await caches.match(event.request)
+  if (event.request.method === 'GET') {
+    // fetch dynamic files the first time and return the second time from the cache
+    event.respondWith((async () => {
+      const response = await caches.match(event.request)
 
-    if (response) return response;
+      if (response) return response;
 
-    console.log('Dynamic Caching: %s', event.request.url)
-    const result = await fetch(event.request)
-    const cache = await caches.open('dynamic_files')
+      console.log('Dynamic Caching: %s', event.request.url)
+      const result = await fetch(event.request)
+      const cache = await caches.open('dynamic_files')
 
-    cache.put(event.request.url, result.clone())
+      cache.put(event.request.url, result.clone())
 
-    return result
-  })())
+      return result
+    })())
+  }
 })
 
+// BackgroundSynchronisation
 self.addEventListener('sync', event => {
-  console.log(event)
+  if(event.tag === 'sync-post') {
+    event.waitUntil((async () => {
+      try {
+        const response = await fetch(
+          'https://jsonplaceholder.typicode.com/posts', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json'
+            },
+            body: JSON.stringify({ title: 'How to Sync', body: 'Sync with ServiceWorker' })
+          })
+
+        const body = await response.json()
+        const clients = await event.currentTarget.clients.matchAll()
+
+        clients.forEach(client => client.postMessage(body))
+        console.log('Sync %s', body.title)
+
+      } catch (error) {
+        console.log(error)
+      }
+    })())
+  }
 })
 
 const arrayIncludes = (string, array) => {

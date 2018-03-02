@@ -34,7 +34,7 @@ const registerSync = async () => {
   if ('serviceWorker' in navigator && 'SyncManager' in window) {
     const serviceWorker = await navigator.serviceWorker.ready
 
-    return serviceWorker.sync.register('sync-work');
+    return serviceWorker.sync.register('sync-post');
   }
 };
 
@@ -43,6 +43,8 @@ const showButton = document.querySelector('#backgroundSync')
 
 showButton.addEventListener('click', async () => {
   await registerSync()
+});
 
-  snackBarContainer.MaterialSnackbar.showSnackbar({ message: 'Background Task registered' })
+navigator.serviceWorker.addEventListener('message', async event => {
+  snackBarContainer.MaterialSnackbar.showSnackbar({ message: `Article "${event.data.title}" added` })
 });
