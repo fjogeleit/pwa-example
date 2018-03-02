@@ -10,12 +10,11 @@ const STATIC_FILES = [
 self.addEventListener('install', event => {
   console.log('Service Worker install', event);
 
-  event.waitUntil(
-    caches.open('static_files').then(cache => {
-      console.log('Precaching...');
-      cache.addAll(STATIC_FILES);
-    })
-  )
+  event.waitUntil((async () => {
+    const cache = await caches.open('static_files')
+
+    return cache.addAll(STATIC_FILES)
+  })())
 });
 
 self.addEventListener('fetch', (event) => {
@@ -24,6 +23,33 @@ self.addEventListener('fetch', (event) => {
     event.respondWith(
       caches.match(event.request)
     );
+
+    return;
+  }
+
+  if (event.request.headers.get('accept').includes('application/json')) {
+    // try to return new data, cache as fallback
+    event.respondWith((async () => {
+      try {
+        const response = await fetch(event.request)
+        const cache = await caches.open('dynamic_files')
+
+        cache.put(event.request.url, response.clone())
+        console.log('Return from fetch %s', event.request.url)
+
+        return response
+
+      } catch (error) {
+        const cached = await caches.match(event.request)
+
+        if (cached) {
+          console.log('Return from cache %s', event.request.url)
+          return cached
+        }
+
+        throw error
+      }
+    })())
 
     return;
   }
