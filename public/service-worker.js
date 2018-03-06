@@ -76,22 +76,23 @@ self.addEventListener('sync', event => {
   if(event.tag === 'sync-post') {
     event.waitUntil((async () => {
       try {
-        const response = await fetch(
-          'https://jsonplaceholder.typicode.com/posts', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Accept': 'application/json'
-            },
-            body: JSON.stringify({ title: 'How to Sync', body: 'Sync with ServiceWorker' })
-          })
+        setTimeout(async () => {
+          const response = await fetch(
+            'https://jsonplaceholder.typicode.com/posts', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+              },
+              body: JSON.stringify({ title: 'How to Sync', body: 'Sync with ServiceWorker' })
+            })
 
-        const body = await response.json()
-        const clients = await event.currentTarget.clients.matchAll()
+          const body = await response.json()
+          const clients = await event.currentTarget.clients.matchAll()
 
-        clients.forEach(client => client.postMessage(body))
-        console.log('Sync %s', body.title)
-
+          clients.forEach(client => client.postMessage(body))
+          console.log('Sync %s', body.title)
+        }, 1000)
       } catch (error) {
         console.log(error)
       }
@@ -105,7 +106,7 @@ self.addEventListener('notificationclick', event => {
   event.waitUntil((async () => {
     const list = await event.currentTarget.clients.matchAll()
 
-    const client = list.find(entry => console.log(entry) || entry.visibilityState === 'visible')
+    const client = list.find(entry => entry.visibilityState === 'visible')
 
     if (client !== undefined) {
       client.navigate('https://pwa.webdev-jogeleit.de/welcome.html')

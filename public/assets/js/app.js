@@ -9,6 +9,10 @@
   }
 })();
 
+const closeMenu = () => {
+  $('.mdl-layout__drawer, .mdl-layout__obfuscator').removeClass('is-visible')
+}
+
 const registerSync = async () => {
   if ('serviceWorker' in navigator && 'SyncManager' in window) {
     const serviceWorker = await navigator.serviceWorker.ready
@@ -22,6 +26,8 @@ const showButton = document.querySelector('#backgroundSync')
 
 showButton.addEventListener('click', async () => {
   await registerSync()
+
+  closeMenu()
 });
 
 
