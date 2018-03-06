@@ -49,7 +49,7 @@ if ('Notification' in window && navigator.serviceWorker) {
     if (Notification.permission === 'granted') {
       const serviceWorker = await navigator.serviceWorker.ready
 
-      serviceWorker.showNotification('Hello DresdenJS!', {
+      return serviceWorker.showNotification('Hello DresdenJS!', {
         body: 'Welcome to my PWA talk!',
         icon: 'assets/icons/icon192x192.png',
         vibrate: [100, 50, 100],
@@ -63,8 +63,10 @@ if ('Notification' in window && navigator.serviceWorker) {
 
   const notificationLink = document.querySelector('#helloNotification');
 
-  notificationLink.addEventListener('click', (event) => {
+  notificationLink.addEventListener('click', async event => {
     event.preventDefault()
-    welcome()
+    await welcome()
+
+    closeMenu()
   });
 }
