@@ -1,6 +1,7 @@
 const STATIC_FILES = [
   '/',
   '/index.html',
+  '/welcome.html',
   '/assets/js/app.js',
   '/assets/css/material.min.css',
   'https://fonts.googleapis.com/css?family=Roboto:400,700',
@@ -97,6 +98,25 @@ self.addEventListener('sync', event => {
     })())
   }
 })
+
+self.addEventListener('notificationclick', event => {
+  const notification = event.notification;
+
+  event.waitUntil((async () => {
+    const list = await event.currentTarget.clients.matchAll()
+
+    const client = list.find(entry => console.log(entry) || entry.visibilityState === 'visible')
+
+    if (client !== undefined) {
+      client.navigate('https://pwa.webdev-jogeleit.de/welcome.html')
+      client.focus()
+    } else {
+      clients.openWindow('https://pwa.webdev-jogeleit.de/welcome.html')
+    }
+
+    notification.close();
+  })())
+});
 
 const arrayIncludes = (string, array) => {
   if (string.indexOf(self.origin) === -1) {

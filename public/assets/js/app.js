@@ -1,24 +1,3 @@
-// Read example data from an external api
-(async () => {
-  const response = await fetch('https://jsonplaceholder.typicode.com/posts', {
-    headers: new Headers({
-      'Accept': 'application/json; charset=utf-8'
-    })
-  })
-  const body = await response.json()
-
-  body.slice(0, 11).map((entry) => $('.page-content').append(`
-    <div class="mdl-cell mdl-cell--12-col">
-      <div class="mdl-card mdl-shadow--2dp">
-        <div class="mdl-card__title">
-          <h2 class="mdl-card__title-text">${entry.title}</h2>
-        </div>
-        <div class="mdl-card__supporting-text">${entry.body}</div>
-      </div>
-    </div>
-  `))
-})();
-
 (async () => {
   if ('serviceWorker' in navigator) {
     try {
@@ -45,6 +24,41 @@ showButton.addEventListener('click', async () => {
   await registerSync()
 });
 
-navigator.serviceWorker.addEventListener('message', async event => {
-  snackBarContainer.MaterialSnackbar.showSnackbar({ message: `Article "${event.data.title}" added` })
-});
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.addEventListener('message', async event => {
+    event.preventDefault()
+
+    snackBarContainer.MaterialSnackbar.showSnackbar(
+      { message: `Article "${event.data.title}" added` })
+  });
+}
+
+if ('Notification' in window && navigator.serviceWorker) {
+  Notification.requestPermission((status) => {
+    console.log('Notification permission status:', status);
+  });
+
+  const welcome = async () => {
+    if (Notification.permission === 'granted') {
+      const serviceWorker = await navigator.serviceWorker.ready
+
+      serviceWorker.showNotification('Hello DresdenJS!', {
+        body: 'Welcome to my PWA talk!',
+        icon: 'assets/icons/icon192x192.png',
+        vibrate: [100, 50, 100],
+        data: {
+          dateOfArrival: Date.now(),
+          primaryKey: 1
+        }
+      });
+    }
+  };
+
+  const notificationLink = document.querySelector('#helloNotification');
+
+  notificationLink.addEventListener('click', (event) => {
+    event.preventDefault()
+    welcome()
+  });
+}
