@@ -7,7 +7,7 @@
 
 * this project using ES6 features without any transpiler, so Chrome for testing is recommanded
 
-## Try the Live
+## Try it
 
 * Online exmaple: https://pwa.webdev-jogeleit.de
 
@@ -27,6 +27,6 @@
 * Register a new sync task
 * Using the sync event
 
-### Push / Notifications
+### Notifications API
 
 * Send a Notification on click and link to your PWA
