@@ -18,6 +18,14 @@ self.addEventListener('install', event => {
   })())
 })
 
+self.addEventListener('activate', event => {
+  console.log('Service Worker activated', event);
+
+  event.waitUntil((async () => {
+    return event.waitUntil(self.clients.claim());
+  })())
+})
+
 self.addEventListener('fetch', (event) => {
   // return static files from the cache
   if (arrayIncludes(event.request.url, STATIC_FILES) === true) {
