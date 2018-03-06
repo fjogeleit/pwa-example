@@ -22,7 +22,7 @@
   "scope": ".",
   "display": "standalone",
   "orientation": "portrait-primary",
-  "background_color": "#EED71D",
+  "background_color": "#f7df1e",
   "theme_color": "#000000",
   "description": "A Progressive Web App Example in plain JavaScript",
   "lang": "de-DE"
