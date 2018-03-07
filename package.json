@@ -11,12 +11,13 @@
     "start": "http-server -c-1"
   },
   "author": "Frank Jogeleit",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/fjogeleit/pwa-example/issues"
   },
   "homepage": "https://github.com/fjogeleit/pwa-example#readme",
   "devDependencies": {
-    "http-server": "^0.11.1"
+    "http-server": "^0.11.1",
+    "workbox-cli": "^3.0.0-beta.2"
   }
 }

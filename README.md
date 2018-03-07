@@ -18,9 +18,9 @@
 
 ### Caching
 
-* Using cache for static files
-* Using cache for dynamic / CDN files
-* Using the cache as fallback for get api calls while the device is still offline
+* Cache Strategy: Cache only (classic / with Workbox)
+* Cache Strategy: Cache first, Network fallback (CDN Files)
+* Cache Strategy: Network first, Cache fallback (GET APIs)
 
 ### BackgroundSync
 

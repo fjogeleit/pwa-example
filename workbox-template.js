@@ -4,51 +4,13 @@ workbox.skipWaiting();
 workbox.clientsClaim();
 
 workbox.precaching.suppressWarnings();
-workbox.precaching.precacheAndRoute([
-  {
-    "url": "assets/css/material.min.css",
-    "revision": "47d2209b491e91f5af769e3effb69222"
-  },
-  {
-    "url": "assets/icons/icon144x144.png",
-    "revision": "c8ae3fe19408abbcc1c8ba6e0ee82188"
-  },
-  {
-    "url": "assets/icons/icon192x192.png",
-    "revision": "1b49b80e2959151213ae21abee47c309"
-  },
-  {
-    "url": "assets/icons/icon512x512.png",
-    "revision": "831d976e8d0b020d3c8cca3338120c64"
-  },
-  {
-    "url": "assets/js/app.js",
-    "revision": "0d837bbd74377da36c1ae8d6ddce4ddd"
-  },
-  {
-    "url": "assets/js/home.js",
-    "revision": "3b26336c72d577044c3a3f97386d5a89"
-  },
-  {
-    "url": "assets/js/material.min.js",
-    "revision": "713af0c6ce93dbbce2f00bf0a98d0541"
-  },
-  {
-    "url": "index.html",
-    "revision": "7ceb390bc63e6d726033ad21ad98c27d"
-  },
-  {
-    "url": "manifest.json",
-    "revision": "64fed54b947e4758b23e31b9119d262b"
-  },
-  {
-    "url": "welcome.html",
-    "revision": "3f91a67bd74e0e91cbffc9569f69b17a"
-  }
-]);
+workbox.precaching.precacheAndRoute([]);
 
 self.addEventListener('fetch', (event) => {
-  // try to return new data, cache as fallback
+
+  /**
+   * Cache Strategy Network first, Cache fallback
+   */
   if (event.request.headers.get('accept').includes('application/json')) {
     event.respondWith((async () => {
       try {
@@ -75,6 +37,9 @@ self.addEventListener('fetch', (event) => {
     return
   }
 
+  /**
+   * Cache Strategy Cache first, Network fallback
+   */
   if (event.request.method === 'GET') {
     // fetch dynamic files the first time and return the second time from the cache
     event.respondWith((async () => {
