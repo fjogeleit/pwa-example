@@ -1,4 +1,5 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/3.0.0-beta.2/workbox-sw.js");
+importScripts("https://cdn.jsdelivr.net/npm/idb@2.1.0/lib/idb.min.js");
 
 workbox.skipWaiting();
 workbox.clientsClaim();
@@ -58,34 +59,64 @@ self.addEventListener('fetch', (event) => {
   }
 })
 
+/************************** BackgroundSync ************************************/
+
+const clearNewArticles = (db) => {
+  const clearTransaction = db.transaction('new-article', 'readwrite')
+
+  clearTransaction.objectStore('new-article').clear()
+
+  return clearTransaction.complete
+}
+
 // BackgroundSynchronisation
 self.addEventListener('sync', event => {
-  if(event.tag === 'sync-post') {
+  if(event.tag === 'sync-posted-articles') {
     event.waitUntil((async () => {
+      const db = await idb.open('article-store', 1, function (db) {
+        if (!db.objectStoreNames.contains('posts')) {
+          db.createObjectStore('new-article', { keyPath: 'id' });
+        }
+        if (!db.objectStoreNames.contains('sync-posts')) {
+          db.createObjectStore('saved-article', { keyPath: 'id' });
+        }
+      });
+
       try {
-        setTimeout(async () => {
+        const newTransaction = db.transaction('new-article', 'readonly')
+
+        await Promise.all((await newTransaction.objectStore('new-article').getAll()).map(async article => {
           const response = await fetch(
-            'https://jsonplaceholder.typicode.com/posts', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-              },
-              body: JSON.stringify({ title: 'How to Sync', body: 'Sync with ServiceWorker' })
-            })
+            'https://jsonplaceholder.typicode.com/posts',
+            { method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' }, body: JSON.stringify(article) }
+          )
 
           const body = await response.json()
-          const clients = await event.currentTarget.clients.matchAll()
+          const savedTransaction = db.transaction('saved-article', 'readwrite')
 
-          clients.forEach(client => client.postMessage(body))
+          await savedTransaction.objectStore('saved-article').put({
+            id: Date.now(),
+            title: body.title,
+            body: body.text
+          })
           console.log('Sync %s', body.title)
-        }, 1000)
+
+          return savedTransaction.complete
+        }));
+
+        clearNewArticles(db)
+
+        const clients = await event.currentTarget.clients.matchAll()
+        clients.forEach(client => client.postMessage({ title: 'New Articles saved' }))
+
       } catch (error) {
         console.log(error)
       }
     })())
   }
 })
+
+/***************************** Notification ***********************************/
 
 self.addEventListener('notificationclick', event => {
   const notification = event.notification;

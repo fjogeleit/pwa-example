@@ -1,4 +1,5 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/3.0.0-beta.2/workbox-sw.js");
+importScripts("https://cdn.jsdelivr.net/npm/idb@2.1.0/lib/idb.min.js");
 
 workbox.skipWaiting();
 workbox.clientsClaim();
@@ -23,32 +24,43 @@ workbox.precaching.precacheAndRoute([
   },
   {
     "url": "assets/js/app.js",
-    "revision": "0d837bbd74377da36c1ae8d6ddce4ddd"
+    "revision": "477f12e90d9e1cc6015a41149652c98e"
   },
   {
     "url": "assets/js/home.js",
-    "revision": "3b26336c72d577044c3a3f97386d5a89"
+    "revision": "c83f6052b1e1f74cc78ac7318c21775c"
   },
   {
     "url": "assets/js/material.min.js",
     "revision": "713af0c6ce93dbbce2f00bf0a98d0541"
   },
   {
+    "url": "assets/js/post_article.js",
+    "revision": "eef5e83a810dadaa425fc675ead26de6"
+  },
+  {
     "url": "index.html",
-    "revision": "7ceb390bc63e6d726033ad21ad98c27d"
+    "revision": "1ba72dc379572688b98dd7630bedf635"
   },
   {
     "url": "manifest.json",
     "revision": "64fed54b947e4758b23e31b9119d262b"
   },
   {
+    "url": "post_article.html",
+    "revision": "e9a474bcdff2e5241e62ff474f708169"
+  },
+  {
     "url": "welcome.html",
-    "revision": "3f91a67bd74e0e91cbffc9569f69b17a"
+    "revision": "7907247c9441d37653789bef11aa11e1"
   }
 ]);
 
 self.addEventListener('fetch', (event) => {
-  // try to return new data, cache as fallback
+
+  /**
+   * Cache Strategy Network first, Cache fallback
+   */
   if (event.request.headers.get('accept').includes('application/json')) {
     event.respondWith((async () => {
       try {
@@ -75,6 +87,9 @@ self.addEventListener('fetch', (event) => {
     return
   }
 
+  /**
+   * Cache Strategy Cache first, Network fallback
+   */
   if (event.request.method === 'GET') {
     // fetch dynamic files the first time and return the second time from the cache
     event.respondWith((async () => {
@@ -93,34 +108,64 @@ self.addEventListener('fetch', (event) => {
   }
 })
 
+/************************** BackgroundSync ************************************/
+
+const clearNewArticles = (db) => {
+  const clearTransaction = db.transaction('new-article', 'readwrite')
+
+  clearTransaction.objectStore('new-article').clear()
+
+  return clearTransaction.complete
+}
+
 // BackgroundSynchronisation
 self.addEventListener('sync', event => {
-  if(event.tag === 'sync-post') {
+  if(event.tag === 'sync-posted-articles') {
     event.waitUntil((async () => {
+      const db = await idb.open('article-store', 1, function (db) {
+        if (!db.objectStoreNames.contains('posts')) {
+          db.createObjectStore('new-article', { keyPath: 'id' });
+        }
+        if (!db.objectStoreNames.contains('sync-posts')) {
+          db.createObjectStore('saved-article', { keyPath: 'id' });
+        }
+      });
+
       try {
-        setTimeout(async () => {
+        const newTransaction = db.transaction('new-article', 'readonly')
+
+        await Promise.all((await newTransaction.objectStore('new-article').getAll()).map(async article => {
           const response = await fetch(
-            'https://jsonplaceholder.typicode.com/posts', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-              },
-              body: JSON.stringify({ title: 'How to Sync', body: 'Sync with ServiceWorker' })
-            })
+            'https://jsonplaceholder.typicode.com/posts',
+            { method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' }, body: JSON.stringify(article) }
+          )
 
           const body = await response.json()
-          const clients = await event.currentTarget.clients.matchAll()
+          const savedTransaction = db.transaction('saved-article', 'readwrite')
 
-          clients.forEach(client => client.postMessage(body))
+          await savedTransaction.objectStore('saved-article').put({
+            id: Date.now(),
+            title: body.title,
+            body: body.text
+          })
           console.log('Sync %s', body.title)
-        }, 1000)
+
+          return savedTransaction.complete
+        }));
+
+        clearNewArticles(db)
+
+        const clients = await event.currentTarget.clients.matchAll()
+        clients.forEach(client => client.postMessage({ title: 'New Articles saved' }))
+
       } catch (error) {
         console.log(error)
       }
     })())
   }
 })
+
+/***************************** Notification ***********************************/
 
 self.addEventListener('notificationclick', event => {
   const notification = event.notification;

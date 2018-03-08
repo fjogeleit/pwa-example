@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset=utf-8>
+  <meta name=viewport content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#f7df1e"/>
+
+  <title>DresdenJS - PWA by Example</title>
+
+  <link rel="icon" type="image/png" href="assets/icons/icon144x144.png">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,700">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  <link rel="stylesheet" href="assets/css/material.min.css">
+  <link rel="manifest" href="manifest.json">
+  <style>
+    form,
+    .page-content .mdl-card,
+    .page-content .mdl-textfield {
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+
+<div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+
+  <header class="mdl-layout__header mdl-layout__header--scroll">
+    <div class="mdl-layout__header-row">
+      <!-- Title -->
+      <span class="mdl-layout-title">PWA by Example</span>
+      <!-- Add spacer, to align navigation to the right -->
+      <div class="mdl-layout-spacer"></div>
+      <!-- Navigation -->
+      <nav class="mdl-navigation">
+      </nav>
+    </div>
+  </header>
+  <div class="mdl-layout__drawer">
+    <span class="mdl-layout-title">Title</span>
+    <nav class="mdl-navigation">
+      <a class="mdl-navigation__link" href="/">Article</a>
+      <a class="mdl-navigation__link" href="post_article.html">Post Article</a>
+      <a class="mdl-navigation__link" id="helloNotification" href="#">Hello Notification</a>
+    </nav>
+  </div>
+
+  <main class="mdl-layout__content">
+    <div class="page-content">
+      <div class="mdl-grid">
+        <form action="#" method="post" id="article-form">
+          <div class="mdl-cell mdl-cell--12-col">
+            <div class="mdl-card mdl-shadow--2dp">
+              <div class="mdl-card__title">
+                <h2 class="mdl-card__title-text">Post Article</h2>
+              </div>
+              <div class="mdl-card__supporting-text">
+                <div class="mdl-textfield mdl-js-textfield">
+                  <input class="mdl-textfield__input" type="text" id="title" required>
+                  <label class="mdl-textfield__label" for="title">Titel</label>
+                </div>
+
+                <div class="mdl-textfield mdl-js-textfield">
+                  <textarea class="mdl-textfield__input" type="text" rows= "3" id="text" required></textarea>
+                  <label class="mdl-textfield__label" for="text">Text lines...</label>
+                </div>
+              </div>
+
+              <div class="mdl-card__actions mdl-card--border">
+                <button class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
+                  Save
+                </button>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div id="demo-toast-example" class="mdl-js-snackbar mdl-snackbar">
+  <div class="mdl-snackbar__text"></div>
+  <button class="mdl-snackbar__action" type="button"></button>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"
+        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+        crossorigin="anonymous"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/idb@2.1.0/lib/idb.min.js"></script>
+
+<script src="assets/js/material.min.js"></script>
+<script src="assets/js/app.js"></script>
+<script src="assets/js/post_article.js"></script>
+</body>
+</html>
