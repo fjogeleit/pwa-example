@@ -69,7 +69,10 @@ const clearNewArticles = (db) => {
   return clearTransaction.complete
 }
 
-// BackgroundSynchronisation
+/**
+ * Using a fake API to send a post request
+ * Save the response in a separate
+ */
 self.addEventListener('sync', event => {
   if(event.tag === 'sync-posted-articles') {
     event.waitUntil((async () => {
