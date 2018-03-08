@@ -44,4 +44,14 @@
       closeMenu()
     });
   }
+
+  const snackBarContainer = document.querySelector('#demo-toast-example')
+
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.addEventListener('message', async event => {
+      event.preventDefault()
+
+      snackBarContainer.MaterialSnackbar.showSnackbar({ message: event.data.title });
+    })
+  }
 })();
