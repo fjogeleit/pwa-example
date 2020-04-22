@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/fjogeleit/pwa-example#readme",
   "devDependencies": {
+    "ecstatic": "^4.1.4",
     "http-server": "^0.12.1",
     "workbox-cli": "^4.3.0"
   }
